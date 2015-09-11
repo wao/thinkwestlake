@@ -7,7 +7,7 @@ TODO: Write a gem description
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'ThinWestLake'
+gem 'thinwestlake'
 ```
 
 And then execute:
@@ -16,7 +16,7 @@ And then execute:
 
 Or install it yourself as:
 
-    $ gem install ThinWestLake
+    $ gem install thinwestlake
 
 ## Usage
 
