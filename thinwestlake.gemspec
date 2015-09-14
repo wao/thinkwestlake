@@ -26,4 +26,5 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "shoulda-context", "~> 1.2"
 
   spec.add_runtime_dependency "main", "> 1"
+  spec.add_runtime_dependency "fattr", "> 2"
 end

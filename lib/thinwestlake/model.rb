@@ -1,3 +1,5 @@
+require 'fattr'
+
 module ThinWestLake::Model
     class BlankSlate < Module
         class << self
@@ -39,41 +41,35 @@ module ThinWestLake::Model
     end
 
 
-    module AttrRw
-        module ClassMethods
-            def attr_rw( *args )
-                args.each do |arg|
-                    def_accessor( arg )
-                end
-            end
-
-            def def_accessor( attr_name )
-                self.class_eval "
-                    def #{attr_name}(value=nil) 
-                        if value.nil?
-                            @#{attr_name}
-                        else
-                            #puts \"#{attr_name}=\#{value}\"
-                            @#{attr_name} = value
-                            self
-                        end
-                    end"
-            end
-        end
-
-        def self.included(mod)
-            class << mod
-                self.include(ClassMethods)
-            end
-        end
-    end
-
     Parameter = Struct.new( :name, :description, :options, :value ) do
-        DEFAULT_OPTIONS = { :required=>true }
+        DEFAULT_OPTIONS = { :required=>true, :type=>:string }
 
-        def self.of( name, description, options = {} )
+        SUPPORT_TYPES = Set.new( [:string, :int, :boolean] )
+
+        def self.of( name, description, options = {}, &blk )
             value = options[:default]
-            self.new( name.to_sym, description, DEFAULT_OPTIONS.merge(options), value )
+            target_options = DEFAULT_OPTIONS.merge(options)
+            check_type(target_options[:type])
+            self.new( name.to_sym, description, target_options, value )
+        end
+
+        def required
+            @options[:required] = true
+        end
+
+        def optional
+            @options[:required] = false
+        end
+
+        def type(value)
+            self.class.check_type(value)
+            @options[:type] = value
+        end
+
+        def self.check_type(value)
+            if !SUPPORT_TYPES.include? value.to_sym
+                puts "Unsupport type #{value}"
+            end
         end
     end
 
@@ -88,8 +84,11 @@ module ThinWestLake::Model
             end
         end
 
-        def __def_param__( param_name, description, options = {} )
+        def __def_param__( param_name, description, options = {}, &blk )
             @params[ param_name.to_sym ] = Parameter.of( param_name, description, options )
+            if blk
+                 @params[ param_name.to_sym ].instance_eval &blk
+            end
 
             __meta_id__.class_eval "def #{param_name}; @params[:\"#{param_name}\"].value; end"
         end
@@ -99,10 +98,12 @@ module ThinWestLake::Model
         end
     end
 
-    class Project
-        include AttrRw
+    class Template
+        fattr :name
 
-        def initialize( parent = nil )
+        def initialize( base_dir, name, parent = nil )
+            @name = name
+            @base_dir = base_dir
             @parent = parent
             @modules = {}
             @context = Context.new

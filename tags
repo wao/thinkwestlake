@@ -1,0 +1,67 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+ApplicationTest	res/templates/activity/androidTest/ApplicationTest.java	/^    public ApplicationTest() {$/;"	m	class:Test
+ApplicationTest	test/res/templates/activity/androidTest/ApplicationTest.java	/^    public ApplicationTest() {$/;"	m	class:Test
+AttrRw	lib/thinwestlake/model.rb	/^    module AttrRw$/;"	m
+BlankSlate	lib/thinwestlake/model.rb	/^    class BlankSlate < Module$/;"	c	class:ThinWestLake
+ClassMethods	lib/thinwestlake/model.rb	/^        module ClassMethods$/;"	m	class:AttrRw
+Context	lib/thinwestlake/model.rb	/^    class Context < BlankSlate$/;"	c
+CopyFileGenerator	lib/thinwestlake/generator.rb	/^    class CopyFileGenerator$/;"	c
+ErbTmpl	lib/thinwestlake/generator.rb	/^    module ErbTmpl$/;"	m	class:ThinWestLake
+JavaFile	lib/thinwestlake/model.rb	/^    class JavaFile$/;"	c
+JavaGenerator	lib/thinwestlake/generator.rb	/^    class JavaGenerator$/;"	c
+PlainFileGenerator	lib/thinwestlake/generator.rb	/^    class PlainFileGenerator$/;"	c
+Resource	lib/thinwestlake/resource.rb	/^    class Resource$/;"	c	class:ThinWestLake
+Template	lib/thinwestlake/model.rb	/^    class Template$/;"	c
+Test	res/templates/activity/androidTest/ApplicationTest.java	/^public class <%= class_name %>Test extends ApplicationTestCase<Application> {$/;"	c
+Test	test/res/templates/activity/androidTest/ApplicationTest.java	/^public class <%= class_name %>Test extends ApplicationTestCase<Application> {$/;"	c
+TestModel	test/units/thinwestlake/model_test.rb	/^class TestModel < Minitest::Test$/;"	c
+TestResource	test/units/thinwestlake/resource_test.rb	/^class TestResource < Minitest::Test$/;"	c
+ThinWestLake	lib/thinwestlake.rb	/^module ThinWestLake$/;"	m
+ThinWestLake	lib/thinwestlake/generator.rb	/^module ThinWestLake::Generator$/;"	m
+ThinWestLake	lib/thinwestlake/model.rb	/^module ThinWestLake::Model$/;"	m
+ThinWestLake	lib/thinwestlake/resource.rb	/^module ThinWestLake$/;"	m
+ThinWestLake	lib/thinwestlake/version.rb	/^module ThinWestLake$/;"	m
+__def_param__	lib/thinwestlake/model.rb	/^        def __def_param__( param_name, description, options = {} )$/;"	f
+__meta_id__	lib/thinwestlake/model.rb	/^        def __meta_id__$/;"	f	class:Context
+__params__	lib/thinwestlake/model.rb	/^        def __params__$/;"	f
+attr_rw	lib/thinwestlake/model.rb	/^            def attr_rw( *args )$/;"	f	class:AttrRw.ClassMethods
+check_type	lib/thinwestlake/model.rb	/^        def check_type(value)$/;"	f
+def_accessor	lib/thinwestlake/model.rb	/^            def def_accessor( attr_name )$/;"	f	class:AttrRw.ClassMethods
+def_param	lib/thinwestlake/model.rb	/^        def def_param( param_name, description, options = {}, &blk )$/;"	f	class:Template
+erb	lib/thinwestlake/generator.rb	/^        def erb( src, dest, context )$/;"	f	class:ThinWestLake.ErbTmpl
+find_hidden_method	lib/thinwestlake/model.rb	/^            def find_hidden_method(name)$/;"	f	class:ThinWestLake.BlankSlate
+generate	lib/thinwestlake/generator.rb	/^        def generate( context, base_dir, *class_names )$/;"	f	class:JavaGenerator
+generate	lib/thinwestlake/generator.rb	/^        def generate( context, target_path )$/;"	f	class:CopyFileGenerator
+generate	lib/thinwestlake/generator.rb	/^        def generate( context, target_path )$/;"	f	class:PlainFileGenerator
+get_module	lib/thinwestlake/model.rb	/^        def get_module(module_name)$/;"	f	class:Template
+has_module?	lib/thinwestlake/model.rb	/^        def has_module?(module_name)$/;"	f	class:Template
+hide	lib/thinwestlake/model.rb	/^            def hide(name)$/;"	f	class:ThinWestLake.BlankSlate
+included	lib/thinwestlake/model.rb	/^        def self.included(mod)$/;"	F	class:AttrRw
+initialize	lib/thinwestlake/generator.rb	/^        def initialize( src_file )$/;"	f	class:CopyFileGenerator
+initialize	lib/thinwestlake/model.rb	/^        def initialize$/;"	f	class:Context
+initialize	lib/thinwestlake/model.rb	/^        def initialize( base_dir, name, parent = nil )$/;"	f	class:Template
+initialize	lib/thinwestlake/model.rb	/^        def initialize(tmpl_file)$/;"	f	class:JavaFile
+initialize	lib/thinwestlake/resource.rb	/^        def initialize(base_path)$/;"	f	class:ThinWestLake.Resource
+initilize	lib/thinwestlake/generator.rb	/^        def initilize( tmpl_file )$/;"	f	class:JavaGenerator
+initilize	lib/thinwestlake/generator.rb	/^        def initilize( tmpl_file )$/;"	f	class:PlainFileGenerator
+java	lib/thinwestlake/model.rb	/^        def java(tmpl_file)$/;"	f	class:Template
+load_templates	lib/thinwestlake/resource.rb	/^        def load_templates$/;"	f	class:ThinWestLake.Resource
+module	lib/thinwestlake/model.rb	/^        def module(module_name, &blk)$/;"	f	class:Template
+of	lib/thinwestlake/model.rb	/^        def self.of( name, description, options = {}, &blk )$/;"	F
+onCreate	res/templates/activity/src/MainActivity.java	/^    protected void onCreate(Bundle savedInstanceState) {$/;"	m	class:__anon1
+onCreate	test/res/templates/activity/src/MainActivity.java	/^    protected void onCreate(Bundle savedInstanceState) {$/;"	m	class:__anon2
+onCreateOptionsMenu	res/templates/activity/src/MainActivity.java	/^    public boolean onCreateOptionsMenu(Menu menu) {$/;"	m	class:__anon1
+onCreateOptionsMenu	test/res/templates/activity/src/MainActivity.java	/^    public boolean onCreateOptionsMenu(Menu menu) {$/;"	m	class:__anon2
+onOptionsItemSelected	res/templates/activity/src/MainActivity.java	/^    public boolean onOptionsItemSelected(MenuItem item) {$/;"	m	class:__anon1
+onOptionsItemSelected	test/res/templates/activity/src/MainActivity.java	/^    public boolean onOptionsItemSelected(MenuItem item) {$/;"	m	class:__anon2
+optional	lib/thinwestlake/model.rb	/^        def optional$/;"	f
+required	lib/thinwestlake/model.rb	/^        def required$/;"	f
+reveal	lib/thinwestlake/model.rb	/^            def reveal(name)$/;"	f	class:ThinWestLake.BlankSlate
+run	bin/twl	/^        def run$/;"	f
+templates	lib/thinwestlake/resource.rb	/^        def templates$/;"	f	class:ThinWestLake.Resource
+type	lib/thinwestlake/model.rb	/^        def type(value)$/;"	f

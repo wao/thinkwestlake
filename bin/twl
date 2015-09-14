@@ -1,3 +1,16 @@
 #!/usr/bin/env ruby
 
+ENV['BUNDLE_GEMFILE']=File.dirname( File.realpath( __FILE__ ) ) + "/../Gemfile"
+
+require 'bundler/setup'
+require 'main'
+
+Main{
+    mode "generate" do
+        def run
+        end
+    end
+}
+
+
 
