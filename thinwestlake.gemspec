@@ -22,9 +22,11 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rake", "~> 10.0"
   spec.add_development_dependency "byebug", "~> 3.5"
   spec.add_development_dependency "minitest", "~> 5"
+  spec.add_development_dependency "mocha", "~> 1.1" 
   spec.add_development_dependency "minitest-reporters", "~> 1"
   spec.add_development_dependency "shoulda-context", "~> 1.2"
 
   spec.add_runtime_dependency "main", "> 1"
   spec.add_runtime_dependency "fattr", "> 2"
+  spec.add_runtime_dependency "activesupport", "> 4"
 end

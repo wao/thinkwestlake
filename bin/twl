@@ -5,10 +5,53 @@ ENV['BUNDLE_GEMFILE']=File.dirname( File.realpath( __FILE__ ) ) + "/../Gemfile"
 require 'bundler/setup'
 require 'main'
 
+require 'thinwestlake/resource'
+
+RESOURCE_PATH = Pathname.new(File.dirname( File.realpath( __FILE__ ) ) + "/../res")
+
+RESOURCE = ThinWestLake::Resource.new( RESOURCE_PATH )
+
 Main{
     mode "generate" do
+        RESOURCE.templates.each_pair do |tmpl_name, tmpl|
+            mode tmpl_name do
+                tmpl.context.__params__.each_pair do |param_name, param_obj|
+                    option( param_name ) do
+                        argument_required
+                        arity 1
+                        cast :string
+                        desc param_obj.description
+                    end
+                end
+
+                @tmpl = tmpl
+
+                def self.tmpl
+                    @tmpl
+                end
+
+                def run
+                    #Assign value from command line
+                    tmpl = self.class.tmpl
+                    tmpl.context.__params__.each_pair do |param_name, param_obj|
+                        puts param[param_name].value
+                        if param[param_name].given?
+                            param_obj.value = param[param_name].value
+                        end
+                    end
+
+                    project = ThinWestLake::Model::Project.new(".")
+
+                    tmpl.generate( project )
+                end
+            end
+        end
+
         def run
         end
+    end
+
+    def run
     end
 }
 

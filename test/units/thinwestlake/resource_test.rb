@@ -8,11 +8,11 @@ class TestResource < Minitest::Test
 
     context "a resource " do
         setup do
-            @resource = Resource.new( File.dirname( __FILE__ ) + "/../../res" )
+            @resource = Resource.new( Pathname.new( File.dirname( __FILE__ ) + "/../../res" ) )
         end
 
         should "enumlate all the templates" do
-            names = [ :java, :activity, :gradle ].sort
+            names = [ :java, :activity2, :gradle ].sort
             assert_equal names, @resource.templates.keys.sort
         end
 

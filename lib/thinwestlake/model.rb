@@ -1,4 +1,8 @@
+require 'active_support'
+require 'active_support/core_ext'
+require 'simple_assert'
 require 'fattr'
+require 'thinwestlake/generator'
 
 module ThinWestLake::Model
     class BlankSlate < Module
@@ -36,6 +40,7 @@ module ThinWestLake::Model
 
         alias_method :__methods__, :methods
         alias_method :__send__, :send
+        alias_method :__class__, :class
 
         instance_methods.each { |m| hide(m.to_s) }
     end
@@ -74,6 +79,15 @@ module ThinWestLake::Model
     end
 
     class Context < BlankSlate
+        def self.from(init_params={})
+            context = self.new
+            init_params.each_pair do |name,value|
+                context.__def_param__( name.to_sym, name )
+                context.__params__[ name.to_sym ].value = value
+            end
+            context
+        end
+
         def initialize
             @params={}
         end
@@ -93,15 +107,41 @@ module ThinWestLake::Model
             __meta_id__.class_eval "def #{param_name}; @params[:\"#{param_name}\"].value; end"
         end
 
+        def __def_method__( name, blk )
+            self.__class__.__send__( :define_method, name.to_sym, &blk )
+        end
+
         def __params__
             @params
+        end
+
+        def get_binding
+            binding
         end
     end
 
     class Template
-        fattr :name
+        fattr :name => nil
+        
+        attr_reader :context
+
+        def self.try_load( base_dir, default_name )
+            if base_dir.directory?
+                rbfile = base_dir + "template.rb"
+                if rbfile.exist?
+                    tmpl = self.new( base_dir, default_name )
+                    tmpl.instance_eval( rbfile.read, rbfile.to_s, 0 )
+                    tmpl
+                else
+                    nil
+                end
+            else
+                nil
+            end
+        end
 
         def initialize( base_dir, name, parent = nil )
+            tm_assert{ base_dir.is_a? Pathname }
             @name = name
             @base_dir = base_dir
             @parent = parent
@@ -136,14 +176,54 @@ module ThinWestLake::Model
             @context.__def_param__( param_name, description, options )
         end
 
-        def java(tmpl_file)
-            @elements << JavaFile.new( tmpl_file )
+        def def_method( name, &block )
+            @context.__def_method__( name, block )
+        end
+
+        DEFAULT_JAVA_OPTION = { :catalog=>:main }
+
+        def java(tmpl_file, options={})
+            @elements << JavaFile.new( @base_dir + tmpl_file, options )
+        end
+
+        def generate(project)
+            @elements.each do |elem|
+                elem.generate( project, context )
+            end
         end
     end
 
     class JavaFile
-        def initialize(tmpl_file)
+        attr_reader :tmpl_file, :options
+
+        def initialize(tmpl_file, options)
+            tm_assert{ tmpl_file.is_a? Pathname }
             @tmpl_file = tmpl_file
+            @options = options
+        end
+
+        def package_name_to_path(package_name)
+            package_name.gsub("\.", "/" )
+        end
+
+        def generate( project, context )
+            base_dir = project.resolve_base_path( :java, options[:catalog] )
+            tm_assert{ base_dir.is_a? Pathname }
+            parent_dir = base_dir + package_name_to_path( context.package_name )
+            parent_dir.mkpath
+
+            ThinWestLake::Generator::ErbTmpl.erb( @tmpl_file, (parent_dir + "#{context.class_name}.java"), context )
+        end
+    end
+
+
+    class Project
+        def initialize( base_path )
+            @base_path = Pathname.new(base_path)
+        end
+
+        def resolve_base_path( file_type, catalog )
+            @base_path + "src/#{catalog}/#{file_type}"
         end
     end
 end

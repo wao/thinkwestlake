@@ -10,7 +10,7 @@ public class <%= class_name %> extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.<%= activty_layout_resid %>);
+        setContentView(R.layout.<%= activity_layout_resid %>);
     }
 
     @Override
