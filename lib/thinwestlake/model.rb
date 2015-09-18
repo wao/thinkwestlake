@@ -14,7 +14,7 @@ module ThinWestLake::Model
                 warn_level = $VERBOSE
                 $VERBOSE = nil
                 if instance_methods.include?(name.to_sym) &&
-                    name !~ /^(__.*|class_eval|respond_to\?|inspect|class)$/
+                    name !~ /^(__.*|class_eval|respond_to\?|inspect|class|nil\?|instance_eval)$/
                     #name !~ /^(__|instance_eval|tm_assert|equal\?|nil\?|!|is_a\?|byebug|throw|class|inspect|instance_variable_set|object_id|instance_variable_get|to_s|method|instance_of\?|respond_to\?|to_ary|hash|eql\?$)/
                     @hidden_methods ||= {}
                     @hidden_methods[name.to_sym] = instance_method(name)
@@ -120,16 +120,38 @@ module ThinWestLake::Model
         end
     end
 
+    class ContextWrap < BlankSlate
+        fattr :params
+
+        def initialize(upper_context,params={})
+            @upper_context = upper_context
+            @params = params
+        end
+
+        def get_binding
+            binding
+        end
+
+        def method_missing(symbol, *args)
+            puts "symbol:#{symbol}"
+            if @params[symbol].nil?
+                @upper_context.__send__( symbol, *args )
+            else
+                @params[symbol]
+            end
+        end
+    end
+
     class Template
         fattr :name => nil
         
         attr_reader :context
 
-        def self.try_load( base_dir, default_name )
+        def self.try_load( base_dir, default_name, parent = nil )
             if base_dir.directory?
                 rbfile = base_dir + "template.rb"
                 if rbfile.exist?
-                    tmpl = self.new( base_dir, default_name )
+                    tmpl = self.new( base_dir, default_name, parent )
                     tmpl.instance_eval( rbfile.read, rbfile.to_s, 0 )
                     tmpl
                 else
@@ -146,7 +168,11 @@ module ThinWestLake::Model
             @base_dir = base_dir
             @parent = parent
             @modules = {}
-            @context = Context.new
+            if parent
+                @context = parent.context
+            else
+                @context = Context.new
+            end
             @elements = []
         end
 
@@ -182,19 +208,127 @@ module ThinWestLake::Model
 
         DEFAULT_JAVA_OPTION = { :catalog=>:main }
 
-        def java(tmpl_file, options={})
-            @elements << JavaFile.new( @base_dir + tmpl_file, options )
+        def java(tmpl_file, options={}, &blk)
+            elem = JavaFile.new( @base_dir + tmpl_file, options )
+            @elements << elem
         end
 
-        def generate(project)
+        def copy(tmpl_file, options={})
+            @elements << CopyFile.new( @base_dir + tmpl_file, options.merge( :target_path=>tmpl_file ) )
+        end
+
+        def plain(tmpl_file, options={})
+            @elements << PlainFile.new( @base_dir + tmpl_file, options.merge( :target_path=>tmpl_file ) )
+        end
+
+        def sub_template(path,options={})
+            @elements << SubTemplate.new( self, @base_dir , path, options )
+        end
+
+        DEFAULT_APPLY_TEMPLATE_OPTIONS={:using_parent_path=>true}
+
+        def apply_template(path,options={})
+            @elements << SubTemplate.new( self, @base_dir , path, DEFAULT_APPLY_TEMPLATE_OPTIONS.merge(options) )
+        end
+
+        def generate(project,context=nil)
+            if context.nil?
+                context = @context
+            end
+
             @elements.each do |elem|
+                puts "Generate from #{elem.name}"
                 elem.generate( project, context )
             end
         end
     end
 
+    class SubTemplate
+        def name
+            @template.name
+        end
+
+        def initialize(base_template, base_dir,template_path, options)
+            @base_template = base_template
+            @base_dir = base_dir
+            @template_path = template_path
+            @template = Template.try_load( base_dir + @template_path, template_path, base_template )
+            tm_assert{ !@template.nil? }
+            @options = options
+        end
+
+        def make_project(project)
+            if @options[:using_parent_path]
+                project
+            else
+                project = Project.new( project.base_path + @template_path )
+                project.base_path.mkpath
+                project
+            end
+        end
+
+        def generate(project, context)
+            @template.generate(make_project(project),context)
+        end
+    end
+
+    module RelativeTemplate
+        def name
+            @tmpl_file
+        end
+
+        def make_target_path(project,context)
+            target_path = project.base_path + @options[ :target_path ]
+            target_path.parent.mkpath
+            if @options[:rename_to]
+                new_name = @options[:rename_to]
+                if new_name.is_a? Proc
+                    new_name = context.instance_eval &new_name
+                end
+                target_path = target_path.parent + new_name
+            end
+            target_path
+        end
+    end
+
+    class CopyFile
+        include RelativeTemplate
+
+        attr_reader :tmpl_file, :options
+
+        def initialize(tmpl_file, options)
+            tm_assert{ tmpl_file.is_a? Pathname }
+            @tmpl_file = tmpl_file
+            @options = options
+        end
+
+        def generate( project, context )
+            FileUtils.copy_file( @tmpl_file, make_target_path(project,context) )
+        end
+    end
+
+    class PlainFile
+        include RelativeTemplate
+
+        attr_reader :tmpl_file, :options
+
+        def initialize(tmpl_file, options)
+            tm_assert{ tmpl_file.is_a? Pathname }
+            @tmpl_file = tmpl_file
+            @options = options
+        end
+
+        def generate( project, context )
+            ThinWestLake::Generator.erb( @tmpl_file, make_target_path(project,context), context )
+        end
+    end
+
     class JavaFile
         attr_reader :tmpl_file, :options
+
+        def name
+            @tmpl_file
+        end
 
         def initialize(tmpl_file, options)
             tm_assert{ tmpl_file.is_a? Pathname }
@@ -206,18 +340,28 @@ module ThinWestLake::Model
             package_name.gsub("\.", "/" )
         end
 
+        def package_name( project, context )
+            context.package_name
+        end
+
+        def class_name( project, context )
+            "#{@options[:class_name_prefix]}#{context.class_name}#{@options[:class_name_postfix]}"
+        end
+
         def generate( project, context )
             base_dir = project.resolve_base_path( :java, options[:catalog] )
             tm_assert{ base_dir.is_a? Pathname }
-            parent_dir = base_dir + package_name_to_path( context.package_name )
+            parent_dir = base_dir + package_name_to_path( package_name(project,context) )
             parent_dir.mkpath
 
-            ThinWestLake::Generator::ErbTmpl.erb( @tmpl_file, (parent_dir + "#{context.class_name}.java"), context )
+            ThinWestLake::Generator.erb( @tmpl_file, (parent_dir + "#{class_name(project,context)}.java"), ContextWrap.new( context, :package_name=>package_name(project,context), :class_name=>class_name(project,context) ) )
         end
     end
 
 
     class Project
+        attr_reader :base_path
+
         def initialize( base_path )
             @base_path = Pathname.new(base_path)
         end
