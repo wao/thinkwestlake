@@ -341,7 +341,7 @@ module ThinWestLake::Model
         end
 
         def package_name( project, context )
-            context.package_name
+            "#{@options[:package_name_prefix]}#{context.package_name}#{@options[:package_name_postfix]}"
         end
 
         def class_name( project, context )
@@ -354,7 +354,7 @@ module ThinWestLake::Model
             parent_dir = base_dir + package_name_to_path( package_name(project,context) )
             parent_dir.mkpath
 
-            ThinWestLake::Generator.erb( @tmpl_file, (parent_dir + "#{class_name(project,context)}.java"), ContextWrap.new( context, :package_name=>package_name(project,context), :class_name=>class_name(project,context) ) )
+            ThinWestLake::Generator.erb( @tmpl_file, (parent_dir + "#{class_name(project,context)}.java"), ContextWrap.new( context, :package_name=>package_name(project,context), :class_name=>class_name(project,context), :original_package_name=>context.package_name ) )
         end
     end
 
