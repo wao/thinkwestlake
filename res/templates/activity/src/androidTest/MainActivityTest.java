@@ -15,7 +15,7 @@ import android.support.test.internal.util.AndroidRunnerParams;
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.*;
-import static org.hamcrest.core.StringEndsWith.*;
+import static org.hamcrest.Matchers.*;
 
 @RunWith(AndroidJUnit4.class)
 public class <%= class_name %>{

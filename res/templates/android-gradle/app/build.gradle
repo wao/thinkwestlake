@@ -70,8 +70,8 @@ dependencies {
     provided 'org.projectlombok:lombok:1.16.4'
 
     //Android Annotation
-    apt "org.androidannotations:androidannotations:3.2"
-    compile 'org.androidannotations:androidannotations-api:3.2'
+    apt "org.androidannotations:androidannotations:3.+"
+    compile 'org.androidannotations:androidannotations-api:3.+'
 
     //SimpleAssert
     compile 'info.thinkmore:simple-assert:1.0-SNAPSHOT'
