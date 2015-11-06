@@ -1,14 +1,10 @@
 # ThinWestLake
 
-TODO: Write a gem description
+A small tools to generate skeleton code for android app development.
 
 ## Installation
 
-Add this line to your application's Gemfile:
-
-```ruby
-gem 'thinwestlake'
-```
+Clone this project
 
 And then execute:
 
@@ -20,7 +16,13 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+### Generate android gradle project sekelton
+
+Run following in shell: 
+
+    $ twl generate android-gradle --package_name your_app_package --activity_name your_main_activity_name
+
+
 
 ## Contributing
 
