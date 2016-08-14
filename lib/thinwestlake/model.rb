@@ -3,6 +3,7 @@ require 'active_support/core_ext'
 require 'simple_assert'
 require 'fattr'
 require 'thinwestlake/generator'
+require 'byebug'
 
 module ThinWestLake::Model
     class BlankSlate < Module
@@ -151,6 +152,7 @@ module ThinWestLake::Model
             if base_dir.directory?
                 rbfile = base_dir + "template.rb"
                 if rbfile.exist?
+                    byebug
                     tmpl = self.new( base_dir, default_name, parent )
                     tmpl.instance_eval( rbfile.read, rbfile.to_s, 0 )
                     tmpl
@@ -353,6 +355,8 @@ module ThinWestLake::Model
             tm_assert{ base_dir.is_a? Pathname }
             parent_dir = base_dir + package_name_to_path( package_name(project,context) )
             parent_dir.mkpath
+
+            #logger.info{ @tmpl_file }
 
             ThinWestLake::Generator.erb( @tmpl_file, (parent_dir + "#{class_name(project,context)}.java"), ContextWrap.new( context, :package_name=>package_name(project,context), :class_name=>class_name(project,context), :original_package_name=>context.package_name ) )
         end

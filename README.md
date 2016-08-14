@@ -21,7 +21,14 @@ Or install it yourself as:
 Run following in shell: 
 
     $ twl generate android-gradle --package_name your_app_package --activity_name your_main_activity_name
+    
+## Thoughts
 
+    This tool should help generate project structure.
+
+    And this tool should also help manager gradle file since it has a lot of trick to do it.
+    
+    And it also helps generate class/source file of java since it has a lot special requirement.
 
 
 ## Contributing
